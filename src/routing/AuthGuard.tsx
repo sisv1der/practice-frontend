@@ -1,15 +1,16 @@
 import { useNavigate } from 'react-router'
 import { useEffect } from 'react'
+import type { User } from '@/types/User'
 
-const AuthGuard = ({ children }) => {
+const AuthGuard = ({ children }: ReactNode): ReactNode => {
     const navigate = useNavigate()
 
     useEffect(() => {
         const raw = localStorage.getItem('user')
-        const user = raw ? JSON.parse(raw) : null
+        const user: User | null = raw ? (JSON.parse(raw) as User) : null
 
         if (!user) {
-            navigate('/login')
+            void navigate('/login')
         }
     }, [navigate])
 

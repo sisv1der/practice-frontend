@@ -1,6 +1,6 @@
-import axios from "axios";
+import axios from 'axios'
 
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL: string = import.meta.env.VITE_API_URL
 
 export const api = axios.create({
     baseURL: API_URL,
@@ -11,23 +11,27 @@ export const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token")
 
     if (token && token !== 'undefined') {
-        config.headers.Authorization = `Bearer ${token}`;
+        config.headers.Authorization = `Bearer ${token}`
     }
 
-    return config;
-});
+    return config
+})
 
 api.interceptors.response.use(
     (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-            localStorage.removeItem("token");
-            window.location.href = "/login";
+    (error: unknown) => {
+        if (axios.isAxiosError(error)) {
+            if (error.response?.status === 401) {
+                localStorage.removeItem("token")
+                window.location.href = "/login"
+            }
         }
 
-        return Promise.reject(error);
+        return Promise.reject(
+            error instanceof Error ? error : new Error("Unknown error")
+        )
     }
-);
+)

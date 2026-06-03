@@ -1,16 +1,17 @@
 import { useNavigate } from 'react-router'
 import { useEffect } from 'react'
+import type { User } from '@/types/User'
 
 const RoleRedirect = () => {
     const navigate = useNavigate()
 
     useEffect(() => {
         const raw = localStorage.getItem('user')
-        const user = raw ? JSON.parse(raw) : null
+        const user: User | null = raw ? (JSON.parse(raw) as User) : null
 
         if (!user) return
 
-        navigate('/' + user.role.toLowerCase())
+        void navigate('/' + user.role.toLowerCase())
     }, [navigate])
 
     return null

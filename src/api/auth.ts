@@ -1,4 +1,4 @@
-import { api } from "@/src/api/client"
+import { api } from "@/api/client"
 
 export interface LoginRequest {
     username: string

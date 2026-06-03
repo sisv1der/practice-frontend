@@ -1,61 +1,87 @@
+import { getUsers } from '@/api/user'
+import UsersTable from '@/pages/admin/UsersTable'
+import { fromUserInfo } from '@/types/User'
 import { useNavigate } from 'react-router'
-import type { User } from '../../src/types/User'
-import { Button } from '../../../components/ui/Button'
-import Sidebar from '../../../components/Sidebar'
+import type { User } from '@/types/User'
+import { Button } from '@/components/ui/Button'
+import Sidebar from '@/components/Sidebar'
 import { useEffect, useState } from 'react'
-import { FieldLabel, FieldLegend, FieldSet, Field } from '../../../components/ui/Field'
-import { Input } from '../../../components/ui/Input'
-import { SelectTrigger, Select, SelectContent, SelectItem, SelectValue } from '../../../components/ui/Select'
-import { Checkbox } from '../../../components/ui/Checkbox'
-import { Table, TableHead, TableHeader, TableRow, TableBody, TableCell } from '../../../components/ui/Table'
-import { ContextMenuContent, ContextMenuItem, ContextMenuTrigger, ContextMenu } from '../../../components/ui/ContextMenu'
-import { Pagination } from "@/components/ui/pagination";
+import { FieldLabel, FieldLegend, FieldSet, Field } from '@/components/ui/Field'
+import { Input } from '@/components/ui/Input'
+import { SelectTrigger, Select, SelectContent, SelectItem, SelectValue } from '@/components/ui/Select'
+import { Checkbox } from '@/components/ui/Checkbox'
 import {
+    Pagination,
     PaginationContent,
     PaginationItem, PaginationLink,
     PaginationNext,
     PaginationPrevious
-} from "../../../components/ui/Pagination.tsx";
-import { deleteUser, updateUser } from '@/src/api/user'
-import type { UpdateUserRequest} from '@/src/api/user'
+} from "@/components/ui/Pagination";
+
+export interface DialogState {
+    createUser: false
+    editUser: false
+    activateUser: false
+    deactivateUser: false
+    changePassword: false
+}
 
 const AdminPage = () => {
     const navigate = useNavigate()
 
+    const [dialogs, setDialogs] = useState<DialogState>({
+        createUser: false,
+        editUser: false,
+        activateUser: false,
+        deactivateUser: false,
+        changePassword: false,
+    })
+
     const [page, setPage] = useState(0)
     const [totalPages, setTotalPages] = useState(10)
 
-    const tempUsers: User[] = [
-        {
-            id: '1',
-            username: 'user1',
-            firstName: 'first_name_1',
-            lastName: 'last_name_1',
-            role: 'EMPLOYEE',
-            isActive: true,
-            createdAt: new Date()
-        },
-        {
-            id: '2',
-            username: 'user2',
-            firstName: 'first_name_2',
-            lastName: 'last_name_2',
-            role: 'ADMIN',
-            isActive: true,
-            createdAt: new Date()
-        },
-        {
-            id: '3',
-            username: 'user3',
-            firstName: 'first_name_3',
-            lastName: 'last_name_3',
-            role: 'OPERATOR',
-            isActive: true,
-            createdAt: new Date()
-        },
-    ]
+    const [filters, setFilters] = useState({
+        username: undefined,
+        role: undefined,
+        active: undefined
+    })
+    
+    const [users, setUsers] = useState<User[]>([])
 
-    const [users, setUsers] = useState<User[]>(tempUsers)
+    useEffect(() => {
+        const loadUsers = async () => {
+            const PAGE_SIZE = 10
+
+            const data = await getUsers({
+                username: filters.username !== '' ? filters.username : undefined,
+                role: filters.role,
+                active: filters.active,
+                page,
+                size: PAGE_SIZE
+            })
+            setUsers(data.content.map(fromUserInfo))
+            setTotalPages(data.totalPages)
+        }
+
+        loadUsers().catch(r => console.log(r))
+    }, [filters.active, filters.role, filters.username, page])
+
+    const raw = localStorage.getItem('user')
+    const user: User | null = raw ? (JSON.parse(raw) as User) : null
+    useEffect(() => {
+        if (!user) void navigate('/')
+    }, [navigate, user])
+    if (!user) return null
+
+    const editUserStatus = (isActive: boolean, id: string) => {
+        setUsers((prev) =>
+            prev.map((user) =>
+                user.id === id
+                    ? { ...user, isActive }
+                    : user
+            )
+        )
+    }
 
     const editUser = (updatedUser: User) => {
         setUsers((prev) =>
@@ -67,30 +93,9 @@ const AdminPage = () => {
         )
     }
 
-    const handleUpdateUser = async (id: string, updatedUser: UpdateUserRequest) => {
-        const res = await updateUser(id, updatedUser)
-
-        editUser(res)
+    const addUser = (user: User) => {
+        setUsers(prev => [...prev, user])
     }
-
-    const removeUser = (id: string) => {
-        setUsers((prev) =>
-            prev.filter((user) =>
-                user.id != id
-            )
-        )
-    }
-
-    const handleDeleteUser = async (id: string) => {
-        deleteUser(id).then(removeUser(id))
-    }
-
-    const raw = localStorage.getItem('user')
-    const user: User = raw ? JSON.parse(raw) : null
-    useEffect(() => {
-        if (!user) navigate('/')
-    }, [navigate, user])
-    if (!user) return null
 
     return (
         <div className="flex">
@@ -118,11 +123,6 @@ const AdminPage = () => {
                         <h2 className="text-xl text-gray-900 font-semibold">
                             Пользователи
                         </h2>
-                        <div>
-                            <Button>
-                                Создать
-                            </Button>
-                        </div>
                     </section>
 
                     <section>
@@ -137,6 +137,12 @@ const AdminPage = () => {
                                         <Input
                                             id="search-input"
                                             placeholder="Иванов"
+                                            onChange={(e) =>
+                                                setFilters(prev => ({
+                                                    ...prev,
+                                                    username: e.target.value
+                                                }))
+                                            }
                                         />
                                     </Field>
 
@@ -144,7 +150,15 @@ const AdminPage = () => {
                                         <FieldLabel htmlFor="user-role">
                                             Роль
                                         </FieldLabel>
-                                        <Select defaultValue="">
+                                        <Select
+                                            defaultValue=""
+                                            onValueChange={(value) => {
+                                                setFilters(prev => ({
+                                                    ...prev,
+                                                    role: value
+                                                }))
+                                            }}
+                                        >
                                             <SelectTrigger id="user-role">
                                                 <SelectValue placeholder="Роль" />
                                             </SelectTrigger>
@@ -169,7 +183,15 @@ const AdminPage = () => {
                                         orientation="horizontal"
                                         className="w-fit pt-6"
                                     >
-                                        <Checkbox id="active-only" />
+                                        <Checkbox
+                                            id="active-only"
+                                            onCheckedChange={(checked) => {
+                                                setFilters(prev => ({
+                                                    ...prev,
+                                                    active: checked
+                                                }))
+                                            }}
+                                        />
                                         <FieldLabel
                                             htmlFor="active-only"
                                             className="font-normal"
@@ -182,58 +204,52 @@ const AdminPage = () => {
                         </form>
                     </section>
 
-                    <section>
-                        <Table>
-                            <TableHeader>
+                    <UsersTable
+                        users={users}
 
-                                        <TableRow>
-                                            <TableHead>Идентификатор</TableHead>
-                                            <TableHead>Имя пользователя</TableHead>
-                                            <TableHead>Роль</TableHead>
-                                            <TableHead>Статус</TableHead>
-                                            <TableHead>Создан</TableHead>
-                                        </TableRow>
+                        onDeactivate={(flag: boolean, id: string) => {
+                            setDialogs(prev => ({
+                                ...prev,
+                                deactivateUser: flag
+                            }))
+                            editUserStatus(false, id)
+                        }}
 
-                            </TableHeader>
-                            <TableBody>
-                                {users.map((user) => (
-                                    <ContextMenu key={user.id}>
-                                        <ContextMenuTrigger asChild>
-                                            <TableRow className="cursor-pointer">
-                                                <TableCell className="font-medium">{user.id}</TableCell>
-                                                <TableCell>{user.username}</TableCell>
-                                                <TableCell>{user.role}</TableCell>
-                                                <TableCell>{user.isActive ? 'Активен' : 'Не активен'}</TableCell>
-                                                <TableCell>{user.createdAt.toLocaleString()}</TableCell>
-                                            </TableRow>
-                                        </ContextMenuTrigger>
-                                        <ContextMenuContent>
-                                            <ContextMenuItem
-                                                onClick={() => {
-                                                    // открыть модальное окно
+                        onActivate={(flag: boolean, id: string) => {
+                            setDialogs(prev => ({
+                                ...prev,
+                                activateUser: flag
+                            }))
+                            editUserStatus(true, id)
+                        }}
 
-                                                    handleUpdateUser(user.id)
-                                                }}
-                                            >
-                                                Изменить
-                                            </ContextMenuItem>
-                                            <ContextMenuItem
-                                                onClick={() => {
-                                                    // открыть модальное окно
+                        onUpdate={(flag: boolean, user: User) => {
+                            setDialogs(prev => ({
+                                ...prev,
+                                editUser: flag
+                            }))
+                            editUser(user)
+                        }}
 
-                                                    handleDeleteUser(user.id)
-                                                }}
-                                                variant="destructive"
-                                            >
-                                                Деактивировать
-                                            </ContextMenuItem>
-                                        </ContextMenuContent>
-                                    </ContextMenu>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </section>
+                        onChangePassword={(flag: boolean) => {
+                            setDialogs(prev => ({
+                                ...prev,
+                                changePassword: flag
+                            }))
+                        }}
 
+                        onCreate={(flag: boolean, user: User) => {
+                            setDialogs(prev => ({
+                                ...prev,
+                                createUser: flag
+                            }))
+                            addUser(user)
+                        }}
+
+                        dialogState={dialogs}
+                    />
+
+                    {totalPages > 1 &&
                     <section className="mt-auto">
                         <Pagination>
                             <PaginationContent>
@@ -270,6 +286,7 @@ const AdminPage = () => {
                             </PaginationContent>
                         </Pagination>
                     </section>
+                    }
                 </div>
             </main>
         </div>

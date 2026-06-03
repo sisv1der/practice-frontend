@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/Input"
 
 import { useState } from "react"
 
-import { LoginData } from "@/src/types/LoginData";
+import type { LoginData } from '@/types/LoginData'
 
 export function LoginForm({
                             className,

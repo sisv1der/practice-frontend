@@ -1,4 +1,4 @@
-import type { UserInfoResponse } from '@/src/api/user'
+import type { UserInfoResponse } from '@/api/user'
 
 export const UserRoles = {
     ADMIN: 'ADMIN',

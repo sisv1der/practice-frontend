@@ -2,11 +2,11 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router'
 
-import '@/src/styles/globals.css'
-import LoginPage from '@/src/pages/login/LoginPage'
-import AdminPage from '@/src/pages/admin/AdminPage'
-import AuthGuard from '@/src/routing/AuthGuard'
-import RoleRedirect from '@/src/routing/RoleRedirect'
+import '@/styles/globals.css'
+import LoginPage from '@/pages/login/LoginPage'
+import AdminPage from '@/pages/admin/AdminPage'
+import AuthGuard from '@/routing/AuthGuard'
+import RoleRedirect from '@/routing/RoleRedirect'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
