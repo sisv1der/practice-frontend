@@ -164,7 +164,9 @@ const CreateUserDialog = ({
                         <DialogClose asChild>
                             <Button variant="outline">Отмена</Button>
                         </DialogClose>
-                        <Button type="submit">Создать</Button>
+                        <DialogClose>
+                            <Button type="submit">Создать</Button>
+                        </DialogClose>
                     </DialogFooter>
                 </form>
             </DialogContent>

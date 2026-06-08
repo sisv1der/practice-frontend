@@ -36,6 +36,8 @@ const CreateCitizenDialog = ({
             ...prevState,
             [name]: value
         }));
+
+        console.log(e.target.name, e.target.value)
     };
 
     const resetState = () => {

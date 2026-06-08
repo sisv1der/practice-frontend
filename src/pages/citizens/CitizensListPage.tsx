@@ -65,22 +65,22 @@ const CitizensListPage = () => {
         reloadCitizens()
     }
 
-    // useEffect(() => {
-    //     const loadUsers = async () => {
-    //         const PAGE_SIZE = 10
-    //
-    //         const data = await getCitizens({
-    //             search: filters.searchInput !== '' ? filters.searchInput : undefined,
-    //             page,
-    //             size: PAGE_SIZE
-    //         })
-    //
-    //         setCitizens(data.content)
-    //         setTotalPages(data.totalPages)
-    //     }
-    //
-    //     loadUsers().catch(r => console.log(r))
-    // }, [filters.searchInput, page])
+    useEffect(() => {
+        const loadCitizens = async () => {
+            const PAGE_SIZE = 10
+
+            const data = await getCitizens({
+                search: filters.searchInput !== '' ? filters.searchInput : undefined,
+                page,
+                size: PAGE_SIZE
+            })
+
+            setCitizens(data.content)
+            setTotalPages(data.totalPages)
+        }
+
+        loadCitizens().catch(r => console.log(r))
+    }, [filters.searchInput, page])
 
     return (
         <div className="flex flex-col min-h-full gap-6">

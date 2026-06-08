@@ -30,7 +30,7 @@ export const getCitizens = async (
 ): Promise<PageResponse<CitizenInfoResponse>> => {
 
     const res = await api.get<PageResponse<CitizenInfoResponse>>(
-        "/users",
+        "/citizens",
         {
             params: {
                 search: request.search,
