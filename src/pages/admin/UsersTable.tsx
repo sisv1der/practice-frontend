@@ -1,16 +1,15 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/ContextMenu'
-import type { DialogState } from '@/pages/admin/AdminPage'
+import type { DialogState } from '@/types/DialogState'
 import ActivateUserDialog from '@/pages/admin/dialogs/ActivateUserDialog'
 import ChangePasswordDialog from '@/pages/admin/dialogs/ChangePasswordDialog'
 import CreateUserDialog from '@/pages/admin/dialogs/CreateUserDialog'
 import DeactivateUserDialog from '@/pages/admin/dialogs/DeactivateUserDialog'
 import EditUserDialog from '@/pages/admin/dialogs/EditUserDialog'
-import { fromUserInfo } from '@/types/User'
 import type { User } from '@/types/User'
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
-import { activateUser, createUser, deactivateUser, updateUser } from '@/api/user'
+import { changeUserStatus, createUser, updateUser } from '@/api/user'
 import type { Role } from '@/api/user'
 
 export interface FormState {
@@ -24,10 +23,10 @@ export interface FormState {
 
 export interface UsersTableProps {
     users: User[]
-    onCreate: (flag: boolean, user: User) => void
-    onUpdate: (flag: boolean, user: User) => void
-    onActivate: (flag: boolean, id: string) => void
-    onDeactivate: (flag: boolean, id: string) => void
+    onCreate: (flag: boolean) => void
+    onUpdate: (flag: boolean) => void
+    onActivate: (flag: boolean) => void
+    onDeactivate: (flag: boolean) => void
     onChangePassword: (flag: boolean) => void
     dialogState: DialogState
 }
@@ -63,19 +62,19 @@ const UsersTable = ({
     }
 
     const handleUserDeactivate = async () => {
-        await deactivateUser(selectedUser.id)
-        onDeactivate(false, selectedUser.id)
+        await changeUserStatus(selectedUser.id, false)
+        onDeactivate(false)
         setSelectedUser(undefined)
     }
 
     const handleUserActivate = async () => {
-        await activateUser(selectedUser.id)
-        onActivate(false, selectedUser.id)
+        await changeUserStatus(selectedUser.id, true)
+        onActivate(false)
         setSelectedUser(undefined)
     }
 
-    const handleUpdateUser = async () => {
-        const res = await updateUser(
+    const handleUpdateUser = async (formState: FormState) => {
+        await updateUser(
             selectedUser.id,
             {
                 username: formState.username,
@@ -87,7 +86,7 @@ const UsersTable = ({
             }
         )
 
-        onUpdate(false, fromUserInfo(res))
+        onUpdate(false)
         resetFormState()
         setSelectedUser(undefined)
     }
@@ -110,8 +109,8 @@ const UsersTable = ({
         resetFormState()
     }
 
-    const handleCreateUser = async () => {
-        const res = await createUser({
+    const handleCreateUser = async (formState: FormState) => {
+        await createUser({
             username: formState.username,
             firstName: formState.firstName,
             lastName: formState.lastName,
@@ -119,7 +118,7 @@ const UsersTable = ({
             role: formState.role
         })
 
-        onCreate(false, fromUserInfo(res))
+        onCreate(false)
         resetFormState()
     }
 
@@ -145,28 +144,28 @@ const UsersTable = ({
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {users.map((user) => (
-                            <ContextMenu key={user.id}>
+                        {users.map((u) => (
+                            <ContextMenu key={u.id}>
                                 <ContextMenuTrigger asChild>
                                     <TableRow className="cursor-pointer">
-                                        <TableCell className="font-medium">{user.id}</TableCell>
-                                        <TableCell>{user.username}</TableCell>
-                                        <TableCell>{user.role}</TableCell>
-                                        <TableCell>{user.lastName} {user.firstName}</TableCell>
-                                        <TableCell>{user.isActive ? 'Активен' : 'Не активен'}</TableCell>
-                                        <TableCell>{user.createdAt.toLocaleString()}</TableCell>
+                                        <TableCell className="font-medium">{u.id}</TableCell>
+                                        <TableCell>{u.username}</TableCell>
+                                        <TableCell>{u.role}</TableCell>
+                                        <TableCell>{u.lastName} {u.firstName}</TableCell>
+                                        <TableCell>{u.isActive ? 'Активен' : 'Не активен'}</TableCell>
+                                        <TableCell>{u.createdAt.toLocaleString()}</TableCell>
                                     </TableRow>
                                 </ContextMenuTrigger>
                                 <ContextMenuContent>
                                     <ContextMenuItem
                                         onClick={() => {
-                                            setSelectedUser(user)
+                                            setSelectedUser(u)
                                             setFormState({
-                                                username: user.username,
-                                                firstName: user.firstName,
-                                                lastName: user.lastName,
-                                                role: user.role,
-                                                isActive: user.isActive
+                                                username: u.username,
+                                                firstName: u.firstName,
+                                                lastName: u.lastName,
+                                                role: u.role,
+                                                isActive: u.isActive
                                             })
                                             onUpdate(true)
                                         }}
@@ -175,13 +174,13 @@ const UsersTable = ({
                                     </ContextMenuItem>
                                     <ContextMenuItem
                                         onClick={() => {
-                                            setSelectedUser(user)
+                                            setSelectedUser(u)
                                             setFormState({
-                                                username: user.username,
-                                                firstName: user.firstName,
-                                                lastName: user.lastName,
-                                                role: user.role,
-                                                isActive: user.isActive
+                                                username: u.username,
+                                                firstName: u.firstName,
+                                                lastName: u.lastName,
+                                                role: u.role,
+                                                isActive: u.isActive
                                             })
                                             onChangePassword(true)
                                         }}
@@ -189,11 +188,11 @@ const UsersTable = ({
                                         Изменить пароль
                                     </ContextMenuItem>
 
-                                    {user.isActive ?
+                                    {u.isActive ?
                                         <ContextMenuItem
                                             onClick={() => {
-                                                setSelectedUser(user)
-                                                onDeactivate(false)
+                                                setSelectedUser(u)
+                                                onDeactivate(true)
                                             }}
                                             variant="destructive"
                                         >
@@ -202,8 +201,8 @@ const UsersTable = ({
                                         :
                                         <ContextMenuItem
                                             onClick={() => {
-                                                setSelectedUser(user)
-                                                onActivate(false)
+                                                setSelectedUser(u)
+                                                onActivate(true)
                                             }}
                                         >
                                             Активировать
@@ -217,7 +216,7 @@ const UsersTable = ({
             </div>
 
             <DeactivateUserDialog
-                open={dialogState.deactivateUser}
+                open={dialogState.deactivate}
 
                 onOpenChange={(flag) => {
                     onDeactivate(flag)
@@ -227,7 +226,7 @@ const UsersTable = ({
             />
 
             <ActivateUserDialog
-                open={dialogState.activateUser}
+                open={dialogState.activate}
 
                 onOpenChange={(flag) => {
                     onActivate(flag)
@@ -237,7 +236,7 @@ const UsersTable = ({
             />
 
             <EditUserDialog
-                open={dialogState.editUser}
+                open={dialogState.edit}
 
                 onOpenChange={(flag) => {
                     onUpdate(flag)
@@ -259,7 +258,7 @@ const UsersTable = ({
             />
 
             <CreateUserDialog
-                open={dialogState.createUser}
+                open={dialogState.create}
 
                 onOpenChange={(flag: boolean) => {
                     onCreate(flag)

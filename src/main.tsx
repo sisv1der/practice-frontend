@@ -1,3 +1,10 @@
+import AppealsListPage from '@/pages/appeals/AppealsListPage'
+import CitizensListPage from '@/pages/citizens/CitizensListPage'
+import AppealPage from '@/pages/appeals/AppealPage'
+import CitizenPage from '@/pages/citizens/CitizenPage'
+import OperatorHome from '@/pages/operator/OperatorHome'
+import OperatorLayout from '@/pages/operator/OperatorLayout'
+import { AuthProvider } from '@/routing/AuthProvider'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router'
@@ -10,35 +17,59 @@ import RoleRedirect from '@/routing/RoleRedirect'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-      <BrowserRouter>
-          <Routes>
-              <Route
-                  path='/'
-                  element={
-                    <AuthGuard>
-                        <RoleRedirect/>
-                    </AuthGuard>
-                  }
-              />
+      <AuthProvider>
+          <BrowserRouter>
+              <Routes>
+                  <Route
+                      path='/'
+                      element={
+                          <RoleRedirect/>
+                      }
+                  />
 
-              <Route
-                  path='/login'
-                  element={
-                      <AuthGuard>
+                  <Route
+                      path='/login'
+                      element={
                           <LoginPage/>
-                      </AuthGuard>
-                  }
-              />
+                      }
+                  />
+                  <Route
+                      element={
+                          <AuthGuard/>
+                      }
+                  >
+                      <Route
+                          path='/admin'
+                          element={
+                              <AdminPage/>
+                          }
+                      />
 
-              <Route
-                  path='/admin'
-                  element={
-                      <AuthGuard>
-                          <AdminPage/>
-                      </AuthGuard>
-                  }
-              />
-          </Routes>
-      </BrowserRouter>
+                      <Route
+                          path='/operator'
+                          element={
+                              <OperatorLayout/>
+                          }
+                      >
+                          <Route index element={<OperatorHome/>}/>
+
+                          <Route path="appeals" element={<AppealsListPage/>}/>
+                          <Route path="appeals/:id" element={<AppealPage/>}>
+                              {/*
+                          TODO: нужно будет делать дочерние страницы (edit и тд)
+                           */}
+                          </Route>
+
+                          <Route path="citizens" element={<CitizensListPage/>}/>
+                          <Route path="citizens/:id" element={<CitizenPage/>}>
+                              {/*
+                          TODO: нужно будет делать дочерние страницы (edit и тд)
+                           */}
+                          </Route>
+                      </Route>
+                  </Route>
+              </Routes>
+          </BrowserRouter>
+      </AuthProvider>
   </StrictMode>,
 )

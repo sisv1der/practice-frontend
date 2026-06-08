@@ -1,23 +1,25 @@
 import { LoginForm } from '@/components/LoginForm'
 
-import type { LoginData } from '@/types/LoginData'
-import { login } from '@/api/auth'
+import type { LoginData } from '@/pages/login/types/LoginData'
+import { loginUser } from '@/api/auth'
 import { getMe } from '@/api/user'
 import type { LoginResponse } from '@/api/auth'
 import type { UserInfoResponse } from '@/api/user'
+import { useAuth } from '@/routing/auth-context'
 import { fromUserInfo } from '@/types/User.ts'
 import { useNavigate } from 'react-router';
 
 const LoginPage = () => {
     const navigate = useNavigate()
+    const { login } = useAuth()
 
     const handleSubmit = async (loginData: LoginData) => {
-        const data: LoginResponse = await login(loginData)
+        const data: LoginResponse = await loginUser(loginData)
 
         localStorage.setItem("token", data.token)
 
-        const user: UserInfoResponse = await getMe()
-        localStorage.setItem('user', JSON.stringify(fromUserInfo(user)))
+        const res: UserInfoResponse = await getMe()
+        login(fromUserInfo(res))
 
         void navigate('/')
     }

@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/Input"
 
 import { useState } from "react"
 
-import type { LoginData } from '@/types/LoginData'
+import type { LoginData } from '@/pages/login/types/LoginData'
 
 export function LoginForm({
                             className,
@@ -28,7 +28,7 @@ export function LoginForm({
     password: ""
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: SubmitEvent) => {
     e.preventDefault();
     try {
       onSubmit(loginData);

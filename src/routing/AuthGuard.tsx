@@ -1,20 +1,18 @@
-import { useNavigate } from 'react-router'
-import { useEffect } from 'react'
-import type { User } from '@/types/User'
+import { useAuth } from '@/routing/auth-context'
+import { Navigate, Outlet } from 'react-router'
 
-const AuthGuard = ({ children }: ReactNode): ReactNode => {
-    const navigate = useNavigate()
+const AuthGuard = () => {
+    const { user, loading } = useAuth()
 
-    useEffect(() => {
-        const raw = localStorage.getItem('user')
-        const user: User | null = raw ? (JSON.parse(raw) as User) : null
+    if (loading) {
+        return <div>Загрузка...</div>
+    }
 
-        if (!user) {
-            void navigate('/login')
-        }
-    }, [navigate])
+    if (!user) {
+        return <Navigate to="/login" replace />
+    }
 
-    return children
+    return <Outlet />
 }
 
 export default AuthGuard

@@ -17,7 +17,7 @@ import { useState } from 'react'
 export interface CreateUserDialogProps {
     open: boolean
     onOpenChange: (flag: boolean) => void
-    handleCreateUser: () => Promise<void>
+    handleCreateUser: (formState: FormState) => Promise<void>
 }
 
 const CreateUserDialog = ({
@@ -63,7 +63,7 @@ const CreateUserDialog = ({
                 <form
                     onSubmit={(e) => {
                         e.preventDefault()
-                        void handleCreateUser()
+                        void handleCreateUser(createState)
                     }}
                 >
                     <DialogHeader>

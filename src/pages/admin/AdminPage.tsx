@@ -1,39 +1,26 @@
 import { getUsers } from '@/api/user'
-import UsersTable from '@/pages/admin/UsersTable'
-import { fromUserInfo } from '@/types/User'
-import { useNavigate } from 'react-router'
-import type { User } from '@/types/User'
-import { Button } from '@/components/ui/Button'
+import PaginationCustom from '@/components/PaginationCustom'
 import Sidebar from '@/components/Sidebar'
-import { useEffect, useState } from 'react'
-import { FieldLabel, FieldLegend, FieldSet, Field } from '@/components/ui/Field'
-import { Input } from '@/components/ui/Input'
-import { SelectTrigger, Select, SelectContent, SelectItem, SelectValue } from '@/components/ui/Select'
+import { Button } from '@/components/ui/Button'
 import { Checkbox } from '@/components/ui/Checkbox'
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem, PaginationLink,
-    PaginationNext,
-    PaginationPrevious
-} from "@/components/ui/Pagination";
-
-export interface DialogState {
-    createUser: false
-    editUser: false
-    activateUser: false
-    deactivateUser: false
-    changePassword: false
-}
+import { Field, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/Field'
+import { Input } from '@/components/ui/Input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
+import UsersTable from '@/pages/admin/UsersTable'
+import { useAuth } from '@/routing/auth-context'
+import type { DialogState } from '@/types/DialogState'
+import type { User } from '@/types/User'
+import { fromUserInfo } from '@/types/User'
+import { useCallback, useEffect, useState } from 'react'
 
 const AdminPage = () => {
-    const navigate = useNavigate()
+    const { user, logout } = useAuth()
 
     const [dialogs, setDialogs] = useState<DialogState>({
-        createUser: false,
-        editUser: false,
-        activateUser: false,
-        deactivateUser: false,
+        create: false,
+        edit: false,
+        activate: false,
+        deactivate: false,
         changePassword: false,
     })
 
@@ -48,53 +35,26 @@ const AdminPage = () => {
     
     const [users, setUsers] = useState<User[]>([])
 
-    useEffect(() => {
-        const loadUsers = async () => {
-            const PAGE_SIZE = 10
-
-            const data = await getUsers({
-                username: filters.username !== '' ? filters.username : undefined,
-                role: filters.role,
-                active: filters.active,
-                page,
-                size: PAGE_SIZE
-            })
-            setUsers(data.content.map(fromUserInfo))
-            setTotalPages(data.totalPages)
-        }
-
-        loadUsers().catch(r => console.log(r))
+    const loadUsers = useCallback(async () => {
+        const PAGE_SIZE = 10
+        console.log('load')
+        const data = await getUsers({
+            username: filters.username !== '' ? filters.username : undefined,
+            role: filters.role,
+            active: filters.active,
+            page,
+            size: PAGE_SIZE
+        })
+        setUsers(data.content.map(fromUserInfo))
+        setTotalPages(data.totalPages)
     }, [filters.active, filters.role, filters.username, page])
-
-    const raw = localStorage.getItem('user')
-    const user: User | null = raw ? (JSON.parse(raw) as User) : null
+    
     useEffect(() => {
-        if (!user) void navigate('/')
-    }, [navigate, user])
-    if (!user) return null
+        loadUsers().catch(r => console.log(r))
+    }, [filters.active, filters.role, filters.username, loadUsers, page])
 
-    const editUserStatus = (isActive: boolean, id: string) => {
-        setUsers((prev) =>
-            prev.map((user) =>
-                user.id === id
-                    ? { ...user, isActive }
-                    : user
-            )
-        )
-    }
-
-    const editUser = (updatedUser: User) => {
-        setUsers((prev) =>
-            prev.map((user) =>
-                user.id === updatedUser.id
-                    ? updatedUser
-                    : user
-            )
-        )
-    }
-
-    const addUser = (user: User) => {
-        setUsers(prev => [...prev, user])
+    const reloadUsers = () => {
+        void loadUsers()
     }
 
     return (
@@ -103,7 +63,7 @@ const AdminPage = () => {
                 <Sidebar
                     pageTitle="Панель администратора"
                     footer={
-                        <Button variant="destructive">
+                        <Button variant="destructive" onClick={logout}>
                             Выйти
                         </Button>
                     }
@@ -172,7 +132,7 @@ const AdminPage = () => {
                                                 <SelectItem value="ADMIN">
                                                     Администратор
                                                 </SelectItem>
-                                                <SelectItem>
+                                                <SelectItem value=" ">
                                                     Все роли
                                                 </SelectItem>
                                             </SelectContent>
@@ -207,28 +167,28 @@ const AdminPage = () => {
                     <UsersTable
                         users={users}
 
-                        onDeactivate={(flag: boolean, id: string) => {
+                        onDeactivate={(flag: boolean) => {
                             setDialogs(prev => ({
                                 ...prev,
-                                deactivateUser: flag
+                                deactivate: flag
                             }))
-                            editUserStatus(false, id)
+                            reloadUsers()
                         }}
 
-                        onActivate={(flag: boolean, id: string) => {
+                        onActivate={(flag: boolean) => {
                             setDialogs(prev => ({
                                 ...prev,
-                                activateUser: flag
+                                activate: flag
                             }))
-                            editUserStatus(true, id)
+                            reloadUsers()
                         }}
 
-                        onUpdate={(flag: boolean, user: User) => {
+                        onUpdate={(flag: boolean) => {
                             setDialogs(prev => ({
                                 ...prev,
-                                editUser: flag
+                                edit: flag
                             }))
-                            editUser(user)
+                            reloadUsers()
                         }}
 
                         onChangePassword={(flag: boolean) => {
@@ -238,12 +198,12 @@ const AdminPage = () => {
                             }))
                         }}
 
-                        onCreate={(flag: boolean, user: User) => {
+                        onCreate={(flag: boolean) => {
                             setDialogs(prev => ({
                                 ...prev,
-                                createUser: flag
+                                create: flag
                             }))
-                            addUser(user)
+                            reloadUsers()
                         }}
 
                         dialogState={dialogs}
@@ -251,40 +211,25 @@ const AdminPage = () => {
 
                     {totalPages > 1 &&
                     <section className="mt-auto">
-                        <Pagination>
-                            <PaginationContent>
-                                <PaginationItem>
-                                    <PaginationPrevious
-                                        onClick={() => {
-                                            if (page > 0) {
-                                                setPage(page - 1)
-                                            }
-                                        }}
-                                        text="Назад"
-                                    />
-                                </PaginationItem>
-                                {Array.from({ length: totalPages}).map((_, index) => (
-                                    <PaginationItem key={index}>
-                                        <PaginationLink
-                                            isActive={page === index}
-                                            onClick={() => setPage(index)}
-                                        >
-                                            {index + 1}
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                ))}
-                                <PaginationItem>
-                                    <PaginationNext
-                                        onClick={() => {
-                                            if (page < totalPages - 1) {
-                                                setPage(page + 1)
-                                            }
-                                        }}
-                                        text="Вперёд"
-                                    />
-                                </PaginationItem>
-                            </PaginationContent>
-                        </Pagination>
+                        <PaginationCustom
+                            onNext={() => {
+                                if (page < totalPages - 1) {
+                                    setPage(page + 1)
+                                }
+                            }}
+
+                            onPrevious={() => {
+                                if (page > 0) {
+                                    setPage(page - 1)
+                                }
+                            }}
+
+                            onClick={(index) => setPage(index)}
+
+                            totalPages={totalPages}
+
+                            page={page}
+                        />
                     </section>
                     }
                 </div>

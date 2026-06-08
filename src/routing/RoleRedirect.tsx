@@ -1,20 +1,15 @@
-import { useNavigate } from 'react-router'
-import { useEffect } from 'react'
-import type { User } from '@/types/User'
+import { useAuth } from '@/routing/auth-context'
+import { Navigate } from 'react-router'
 
 const RoleRedirect = () => {
-    const navigate = useNavigate()
+    console.log('ROLE REDIRECT RENDER')
+    const { user } = useAuth()
 
-    useEffect(() => {
-        const raw = localStorage.getItem('user')
-        const user: User | null = raw ? (JSON.parse(raw) as User) : null
+    if (!user) {
+        return <Navigate to="/login" replace />
+    }
 
-        if (!user) return
-
-        void navigate('/' + user.role.toLowerCase())
-    }, [navigate])
-
-    return null
+    return <Navigate to={`/${user.role.toLowerCase()}`} replace />
 }
 
 export default RoleRedirect

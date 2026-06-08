@@ -1,4 +1,8 @@
 import { api } from '@/api/client'
+import type {
+    PageableRequest,
+    PageResponse
+} from '@/api/client'
 
 export type Role = 'ADMIN' | 'OPERATOR' | 'EMPLOYEE'
 
@@ -29,20 +33,10 @@ export interface CreateUserRequest {
     role: Role
 }
 
-export interface GetUsersRequest {
+export interface GetUsersRequest extends PageableRequest {
     username?: string
     role?: Role
     active?: boolean
-    page?: number
-    size?: number
-}
-
-export interface PageResponse<T> {
-    content: T[]
-    totalPages: number
-    totalElements: number
-    size: number
-    number: number
 }
 
 export const getMe = async (): Promise<UserInfoResponse> => {
@@ -50,18 +44,13 @@ export const getMe = async (): Promise<UserInfoResponse> => {
     return res.data
 }
 
-export const deactivateUser = async (id: string): Promise<void> => {
-    await api.delete(`/users/${id}`)
-}
-
 export const updateUser = async (id: string, request: UpdateUserRequest): Promise<UserInfoResponse> => {
     const res = await api.put<UserInfoResponse>(`/users/${id}`, request)
     return res.data
 }
 
-export const activateUser = async (id: string): Promise<UserInfoResponse> => {
-    const res = await api.patch<UserInfoResponse>(`/users/${id}`)
-    return res.data
+export const changeUserStatus = async (id: string, status: boolean): Promise<void> => {
+    await api.patch(`/users/${id}`, {isActive: status})
 }
 
 export const createUser = async (request: CreateUserRequest) => {

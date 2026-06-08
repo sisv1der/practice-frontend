@@ -17,7 +17,7 @@ import { useState } from 'react'
 export interface EditUserDialogProps {
     open: boolean
     onOpenChange: (flag: boolean) => void
-    handleEditUser: () => Promise<void>
+    handleEditUser: (fromState: FormState) => Promise<void>
     inputFormState: FormState
 }
 
@@ -48,7 +48,7 @@ const EditUserDialog = ({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <form
                 onSubmit={() => {
-                    void handleEditUser()
+                    void handleEditUser(editState)
                 }}
             >
                 <DialogTrigger/>
