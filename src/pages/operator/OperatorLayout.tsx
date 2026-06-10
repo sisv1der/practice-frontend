@@ -3,11 +3,11 @@ import { Outlet } from 'react-router'
 
 const OperatorLayout = () => {
     return (
-        <div className="flex gap-4">
-            <OperatorSidebar/>
+        <div className="flex min-h-screen overflow-hidden">
+            <OperatorSidebar />
 
-            <main className="flex-auto py-6 px-4 h-screen">
-                <Outlet/>
+            <main className="flex-1 overflow-y-auto px-4">
+                <Outlet />
             </main>
         </div>
     )

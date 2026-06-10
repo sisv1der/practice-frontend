@@ -37,7 +37,7 @@ const AdminPage = () => {
 
     const loadUsers = useCallback(async () => {
         const PAGE_SIZE = 10
-        console.log('load')
+
         const data = await getUsers({
             username: filters.username !== '' ? filters.username : undefined,
             role: filters.role,
