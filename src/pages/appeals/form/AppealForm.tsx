@@ -5,7 +5,9 @@ import { Field, FieldGroup, FieldLabel } from '@/components/ui/Field'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
+import CommentCard from '@/pages/appeals/CommentCard'
 import CitizenSelectDialog from '@/pages/appeals/dialogs/CitizenSelectDialog'
+import { useAppealComments } from '@/pages/appeals/hooks/useAppealComments'
 import { useCitizen } from '@/pages/citizens/hooks/useCitizen'
 import type { AppealCategory, AppealStatus } from '@/types/Appeal'
 import { useEffect, useState } from 'react'
@@ -62,6 +64,7 @@ const AppealForm = ({mode, context}: AppealFormProps) => {
     const config = MODE_CONFIG[mode]
 
     const citizen = useCitizen(formState.citizenId)
+    const comments = useAppealComments(context.id)
 
     const goBack = () => {
         void navigate(-1)
@@ -134,7 +137,7 @@ const AppealForm = ({mode, context}: AppealFormProps) => {
                 <h2 className="text-xl font-semibold">
                     {config.title}
                 </h2>
-                <FieldGroup>
+                <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Field>
                         <FieldLabel htmlFor="title">Заголовок</FieldLabel>
                         <Input
@@ -148,7 +151,7 @@ const AppealForm = ({mode, context}: AppealFormProps) => {
                             required
                         />
                     </Field>
-                    <Field>
+                    <Field className="md:col-span-2">
                         <FieldLabel htmlFor="">Описание</FieldLabel>
                         <Input
                             id="description"
@@ -226,23 +229,26 @@ const AppealForm = ({mode, context}: AppealFormProps) => {
                             </SelectContent>
                         </Select>
                     </Field>
-                    <Field>
+                    <Field className="md:col-span-2">
                         <FieldLabel htmlFor="citizen">Гражданин</FieldLabel>
-                        <Label>
-                            {citizen?.fullName || 'Не выбран'}
-                        </Label>
-                        <Button
-                            type="button"
 
-                            onClick={() => setOpenCitizenSelectDialog(true)}
+                        <div className="flex gap-3 items-center">
+                            <Label>
+                                {citizen?.fullName || 'Не выбран'}
+                            </Label>
+                            <Button
+                                type="button"
 
-                            disabled={config.canEditCitizen}
-                        >
-                            Выбрать
-                        </Button>
+                                onClick={() => setOpenCitizenSelectDialog(true)}
+
+                                disabled={!config.canEditCitizen}
+                            >
+                                Выбрать
+                            </Button>
+                        </div>
                     </Field>
                 </FieldGroup>
-                <div className="flex flex-col gap-3 items-center w-full">
+                <div className="flex gap-3 justify-center mt-6">
                     <div>
                         {config.readOnly ? (
                             <Button
@@ -270,6 +276,21 @@ const AppealForm = ({mode, context}: AppealFormProps) => {
                     </Button>
                 </div>
             </form>
+
+            <section className="mt-8">
+                <h3 className="text-lg font-semibold mb-4">
+                    Комментарии
+                </h3>
+
+                <div className="flex flex-col gap-3">
+                    {comments.map(comment => (
+                        <CommentCard
+                            key={comment.id}
+                            comment={comment}
+                        />
+                    ))}
+                </div>
+            </section>
 
             <CitizenSelectDialog
                 open={openCitizenSelectDialog}
