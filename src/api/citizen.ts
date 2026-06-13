@@ -4,6 +4,7 @@ import type {
     PageableRequest,
     PageResponse
 } from '@/api/client'
+import type { Citizen } from '@/types/Citizen'
 
 export interface CreateCitizenRequest {
     fullName: string
@@ -15,13 +16,6 @@ export interface GetCitizensRequest extends PageableRequest {
     search?: string
 }
 
-export interface CitizenInfoResponse {
-    id: string
-    fullName: string
-    phoneNumber: string
-    email: string
-}
-
 export interface UpdateCitizenRequest {
     fullName: string
     phoneNumber: string
@@ -29,16 +23,16 @@ export interface UpdateCitizenRequest {
 }
 
 export const createCitizen = async (request: CreateCitizenRequest) => {
-    const res = await api.post<CitizenInfoResponse>('/citizens', request)
+    const res = await api.post<Citizen>('/citizens', request)
     return res.data
 }
 
 export const getCitizens = async (
     request: GetCitizensRequest
-): Promise<PageResponse<CitizenInfoResponse>> => {
+): Promise<PageResponse<Citizen>> => {
 
-    const res = await api.get<PageResponse<CitizenInfoResponse>>(
-        "/citizens",
+    const res = await api.get<PageResponse<Citizen>>(
+        '/citizens',
         {
             params: {
                 search: request.search,
@@ -51,13 +45,13 @@ export const getCitizens = async (
     return res.data
 }
 
-export const getCitizen = async (id: string): Promise<CitizenInfoResponse> => {
-    const res = await api.get<CitizenInfoResponse>(`/citizens/${id}`)
+export const getCitizen = async (id: string): Promise<Citizen> => {
+    const res = await api.get<Citizen>(`/citizens/${id}`)
     return res.data
 }
 
-export const updateCitizen = async (id: string, request: UpdateCitizenRequest): Promise<CitizenInfoResponse> => {
-    const res = await api.put<CitizenInfoResponse>(`citizens/${id}`, request)
+export const updateCitizen = async (id: string, request: UpdateCitizenRequest): Promise<Citizen> => {
+    const res = await api.put<Citizen>(`citizens/${id}`, request)
     return res.data
 }
 

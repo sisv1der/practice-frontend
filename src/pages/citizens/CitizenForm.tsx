@@ -73,7 +73,7 @@ const CitizenForm = ({readonly = true}: CitizenFormProps) => {
 
                 <Button
                     type="button"
-                    onClick={() => void navigate(`/citizens/${id}/appeals`)}
+                    onClick={() => void navigate(`appeals`)}
                 >
                     Обращения
                 </Button>

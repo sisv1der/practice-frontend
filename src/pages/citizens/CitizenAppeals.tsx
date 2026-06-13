@@ -9,21 +9,22 @@ import type { Appeal } from '@/types/Appeal'
 const CitizenAppeals = () => {
     const navigate = useNavigate()
 
-    const { id } = useParams()
+    const {id} = useParams()
 
-    const [page, setPage] = useState(0)
+    const [ page, setPage ] = useState(0)
 
-    const { appeals, totalPages } = useCitizenAppeals(id, {
-        page,
-        size: 10
-    })
+    const {appeals, totalPages} = useCitizenAppeals(id, page, 10)
 
     const goBack = () => {
         void navigate(-1)
     }
 
     const openAppealPage = (appeal: Appeal) => {
-        void navigate(`/appeals/${appeal.id}`)
+        void navigate(appeal.id)
+    }
+
+    const openCreateAppealPage = () => {
+        void navigate(`new`)
     }
 
     return (
@@ -35,7 +36,14 @@ const CitizenAppeals = () => {
 
                 <Button
                     type="button"
-                    onClick={() => goBack()}
+                    onClick={openCreateAppealPage}
+                >
+                    Создать новое обращение
+                </Button>
+
+                <Button
+                    type="button"
+                    onClick={goBack}
                 >
                     Назад
                 </Button>

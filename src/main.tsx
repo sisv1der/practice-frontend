@@ -1,6 +1,8 @@
 import AppealsListPage from '@/pages/appeals/AppealsListPage'
+import AppealFormCreate from '@/pages/appeals/form/AppealFormCreate'
+import AppealFormEdit from '@/pages/appeals/form/AppealFormEdit'
+import AppealFormView from '@/pages/appeals/form/AppealFormView'
 import CitizensListPage from '@/pages/citizens/CitizensListPage'
-import AppealPage from '@/pages/appeals/AppealPage'
 import CitizenForm from '@/pages/citizens/CitizenForm'
 import CitizenAppeals from '@/pages/citizens/CitizenAppeals'
 import OperatorHome from '@/pages/operator/OperatorHome'
@@ -55,25 +57,16 @@ createRoot(document.getElementById('root')!).render(
                             <Route index element={<OperatorHome/>}/>
 
                             <Route path="appeals" element={<AppealsListPage/>}/>
-                            <Route path="appeals/:id" element={<AppealPage/>}>
-                                {/*
-                          TODO: нужно будет делать дочерние страницы (edit и тд)
-                           */}
-                            </Route>
+                            <Route path="appeals/:id" element={<AppealFormView/>}/>
+                            <Route path="appeals/:id/edit" element={<AppealFormEdit/>}/>
+                            <Route path="appeals/new" element={<AppealFormCreate/>}/>
 
                             <Route path="citizens" element={<CitizensListPage/>}/>
-                            <Route
-                                path="citizens/:id"
-                                element={<CitizenForm readonly/>}
-                            />
-                            <Route
-                                path="citizens/:id/appeals"
-                                element={<CitizenAppeals/>}
-                            />
-                            <Route
-                                path="citizens/:id/edit"
-                                element={<CitizenForm readonly={false}/>}
-                            />
+                            <Route path="citizens/:id" element={<CitizenForm readonly/>}/>
+                            <Route path="citizens/:id/appeals" element={<CitizenAppeals/>}/>
+                            <Route path="citizens/:citizenId/appeals/new" element={<AppealFormCreate/>}/>
+                            <Route path="citizens/:citizenId/appeals/:id" element={<AppealFormView/>}/>
+                            <Route path="citizens/:id/edit" element={<CitizenForm readonly={false}/>}/>
                         </Route>
                     </Route>
                 </Routes>

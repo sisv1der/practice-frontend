@@ -20,25 +20,25 @@ export interface CreateCitizenDialogProps {
 }
 
 const CreateCitizenDialog = ({
-    open,
-    onOpenChange,
-    handleCreate,
-}: CreateCitizenDialogProps) => {
-    const [createState, setCreateState] = useState<CitizenFormState>({
+                                 open,
+                                 onOpenChange,
+                                 handleCreate
+                             }: CreateCitizenDialogProps) => {
+    const [ createState, setCreateState ] = useState<CitizenFormState>({
         fullName: '',
         phoneNumber: '',
         email: ''
     })
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target
         setCreateState(prevState => ({
             ...prevState,
             [name]: value
-        }));
+        }))
 
         console.log(e.target.name, e.target.value)
-    };
+    }
 
     const resetState = () => {
         setCreateState({
@@ -60,6 +60,7 @@ const CreateCitizenDialog = ({
                         e.preventDefault()
                         void handleCreate(createState)
                         resetState()
+                        onOpenChange(false)
                     }}
                 >
                     <DialogHeader>

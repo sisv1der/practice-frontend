@@ -1,7 +1,6 @@
 import { DataTable } from '@/components/DataTable'
 import type { Appeal } from '@/types/Appeal'
 import type { ColumnDef } from '@tanstack/react-table'
-import { useNavigate } from 'react-router'
 
 export interface AppealsTableProps {
     appeals: Appeal[]
