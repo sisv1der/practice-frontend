@@ -8,7 +8,7 @@ import type { CitizenFormState } from '@/pages/citizens/types/CitizenFormState'
 import type { Citizen } from '@/types/Citizen'
 import type { DialogState } from '@/types/DialogState'
 import { useCallback, useEffect, useState } from 'react'
-import { Input } from '@/components/ui/input'
+import { Input } from '@/components/ui/Input'
 
 const CitizensListPage = () => {
     const [ citizens, setCitizens ] = useState<Citizen[]>([])

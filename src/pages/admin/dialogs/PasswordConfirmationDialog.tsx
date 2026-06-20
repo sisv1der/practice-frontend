@@ -18,12 +18,12 @@ export interface PasswordConfirmationDialogProps {
 }
 
 const PasswordConfirmationDialog = ({
-    open,
-    onOpenChange,
-    handlePasswordChange,
-    password
-}: PasswordConfirmationDialogProps) => {
-    <Dialog
+                                        open,
+                                        onOpenChange,
+                                        handlePasswordChange,
+                                        password
+                                    }: PasswordConfirmationDialogProps) => {
+    return <Dialog
         open={open}
         onOpenChange={onOpenChange}
     >

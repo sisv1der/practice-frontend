@@ -12,16 +12,16 @@ export interface PaginationProps {
     onPrevious: () => void
     onClick: (index: number) => void
     totalPages: number
-    page
+    page: number
 }
 
 const PaginationCustom = ({
-    onNext,
-    onPrevious,
-    onClick,
-    totalPages,
-    page
-}: PaginationProps) => {
+                              onNext,
+                              onPrevious,
+                              onClick,
+                              totalPages,
+                              page
+                          }: PaginationProps) => {
     return (
         <Pagination>
             <PaginationContent>
@@ -31,7 +31,7 @@ const PaginationCustom = ({
                         text="Назад"
                     />
                 </PaginationItem>
-                {Array.from({ length: totalPages}).map((_, index) => (
+                {Array.from({length: totalPages}).map((_, index) => (
                     <PaginationItem key={index}>
                         <PaginationLink
                             isActive={page === index}

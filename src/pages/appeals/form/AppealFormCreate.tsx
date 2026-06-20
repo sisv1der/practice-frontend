@@ -1,4 +1,5 @@
 import AppealForm from '@/pages/appeals/form/AppealForm'
+import type { AppealFormState } from '@/pages/appeals/form/AppealForm'
 import { useCitizen } from '@/pages/citizens/hooks/useCitizen'
 import { useParams } from 'react-router'
 
@@ -7,7 +8,7 @@ const AppealFormCreate = () => {
 
     const citizen = useCitizen(id)
 
-    const context = {
+    const context: AppealFormState = {
         id: '',
         title: '',
         description: '',
@@ -15,10 +16,6 @@ const AppealFormCreate = () => {
         category: 'ROADS',
         citizenId: citizen?.id ?? ''
     }
-    //
-    // if (!citizen) {
-    //     return <div>Загрузка...</div>
-    // }
 
     return (
         <AppealForm mode={'create'} context={context}/>

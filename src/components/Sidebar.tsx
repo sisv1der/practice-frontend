@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 import { Card, CardContent, CardFooter } from '@/components/ui/Card'
 import { Separator } from '@/components/ui/Separator'

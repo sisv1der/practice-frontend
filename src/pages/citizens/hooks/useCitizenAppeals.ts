@@ -2,6 +2,7 @@ import type { AppealInfoResponse } from '@/api/appeal'
 import { getCitizenAppeals } from '@/api/citizen'
 import type { PageResponse } from '@/api/client'
 import { fromAppealInfo } from '@/types/Appeal'
+import type { Appeal } from '@/types/Appeal'
 import { useCallback, useEffect, useState } from 'react'
 
 export const useCitizenAppeals = (id: string, page: number, size: number) => {

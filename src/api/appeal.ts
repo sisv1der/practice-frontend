@@ -43,7 +43,9 @@ export interface UpdateAppealRequest {
 }
 
 export const getAppeals = async (request: GetAppealsRequest): Promise<PageResponse<AppealInfoResponse>> => {
-    const res = await api.get<PageResponse<AppealInfoResponse>>('/appeals', request)
+    const res = await api.get<PageResponse<AppealInfoResponse>>('/appeals', {
+        params: request
+    })
     return res.data
 }
 

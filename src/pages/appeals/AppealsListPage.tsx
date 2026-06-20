@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/Input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
 import AppealsTable from '@/pages/appeals/AppealsTable'
 import { useAppeals } from '@/pages/appeals/hooks/useAppeals'
+import type { AppealStatus } from '@/types/Appeal'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
@@ -22,7 +23,7 @@ const AppealsListPage = () => {
 
     const {appeals, totalPages} = useAppeals(
         filters.search,
-        filters.status,
+        filters.status as AppealStatus,
         filters.category,
         page,
         10
@@ -145,7 +146,7 @@ const AppealsListPage = () => {
                             onClick={() =>
                                 void exportAppeals({
                                     search: filters.search,
-                                    status: filters.status,
+                                    status: filters.status as AppealStatus,
                                     category: filters.category
                                 })
                             }

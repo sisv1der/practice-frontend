@@ -41,7 +41,7 @@ export const fromAppealInfo = (dto: AppealInfoResponse) => {
         status: dto.status,
         category: dto.category,
         citizenId: dto.citizenId,
-        createdByID: dto.createdById,
+        createdById: dto.createdById,
         assignedToId: dto.assignedToId,
         createdAt: new Date(dto.createdAt),
         updatedAt: new Date(dto.updatedAt)

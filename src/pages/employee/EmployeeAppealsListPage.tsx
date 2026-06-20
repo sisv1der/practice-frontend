@@ -1,12 +1,11 @@
 import { claimAppeal } from '@/api/appeal'
 import PaginationCustom from '@/components/PaginationCustom'
-import { Button } from '@/components/ui/Button'
 import { Field, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/Field'
 import { Input } from '@/components/ui/Input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
 import { useAppeals } from '@/pages/appeals/hooks/useAppeals'
 import EmployeeAppealsTable from '@/pages/employee/EmployeeAppealsTable'
-import type { Appeal } from '@/types/Appeal'
+import type { Appeal, AppealStatus } from '@/types/Appeal'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
@@ -23,7 +22,7 @@ const EmployeeAppealsListPage = () => {
 
     const {appeals, totalPages, refetch} = useAppeals(
         filters.search,
-        filters.status,
+        filters.status as AppealStatus,
         filters.category,
         page,
         10

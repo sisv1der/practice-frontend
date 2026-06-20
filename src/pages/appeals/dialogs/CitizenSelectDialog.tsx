@@ -1,5 +1,7 @@
 import { DataTable } from '@/components/DataTable'
 import PaginationCustom from '@/components/PaginationCustom'
+import { Field, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/Field'
+import { Input } from '@/components/ui/Input'
 import { useCitizens } from '@/pages/citizens/hooks/useCitizens'
 import type { CitizenFilters } from '@/pages/citizens/hooks/useCitizens'
 import type { Citizen } from '@/types/Citizen'
@@ -19,7 +21,7 @@ export interface CitizenSelectDialogProps {
     handleSelect: (citizen: Citizen) => void
 }
 
-const columns: ColumnDef<Citizen> = [
+const columns: ColumnDef<Citizen>[] = [
     {
         accessorKey: 'fullName',
         header: 'Имя'
@@ -44,7 +46,7 @@ const CitizenSelectDialog = ({
     })
 
     const [ page, setPage ] = useState<number>(0)
-    const {citizens, totalPages} = useCitizens(filters, page)
+    const {citizens, totalPages} = useCitizens(page, filters)
 
     const handleSubmit = (citizen: Citizen) => {
         handleSelect(citizen)
@@ -60,6 +62,32 @@ const CitizenSelectDialog = ({
                         Выбор гражданина
                     </DialogTitle>
                 </DialogHeader>
+
+                <section>
+                    <form>
+                        <FieldSet>
+                            <FieldLegend>Фильтрация</FieldLegend>
+
+                            <div className="flex flex-wrap items-center gap-4">
+                                <Field className="flex-1 min-w-64">
+                                    <FieldLabel htmlFor="search-input">
+                                        Поиск
+                                    </FieldLabel>
+
+                                    <Input
+                                        id="search-input"
+                                        onChange={(e) =>
+                                            setFilters(prev => ({
+                                                ...prev,
+                                                searchInput: e.target.value
+                                            }))
+                                        }
+                                    />
+                                </Field>
+                            </div>
+                        </FieldSet>
+                    </form>
+                </section>
 
                 <DataTable columns={columns} data={citizens} onRowClick={handleSubmit}/>
 

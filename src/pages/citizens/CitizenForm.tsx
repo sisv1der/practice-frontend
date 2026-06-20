@@ -5,7 +5,7 @@ import DeleteCitizenDialog from '@/pages/citizens/dialogs/DeleteCitizenDialog'
 import { useCitizen } from '@/pages/citizens/hooks/useCitizen'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
-import { Input } from '@/components/ui/input'
+import { Input } from '@/components/ui/Input'
 import type { CitizenFormState } from '@/pages/citizens/types/CitizenFormState'
 
 export interface CitizenFormProps {

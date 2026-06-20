@@ -12,15 +12,15 @@ export interface ChangePasswordDialogProps {
 }
 
 const ChangePasswordDialog = ({
-    open,
-    onOpenChange,
-    handlePasswordChange
-}: ChangePasswordDialogProps) => {
-    const [openConfirmationDialog, setOpenConfirmationDialog] = useState(false)
-    const [password, setPassword] = useState('')
+                                  open,
+                                  onOpenChange,
+                                  handlePasswordChange
+                              }: ChangePasswordDialogProps) => {
+    const [ openConfirmationDialog, setOpenConfirmationDialog ] = useState(false)
+    const [ password, setPassword ] = useState('')
 
-    const [errors, setErrors] = useState({
-        confirmPassword: '',
+    const [ errors, setErrors ] = useState({
+        confirmPassword: ''
     })
 
     return (
@@ -46,12 +46,12 @@ const ChangePasswordDialog = ({
                                     name="password"
                                     type="password"
                                     onChange={(e) => setPassword(e.target.value)}
-                                    required />
+                                    required/>
                             </Field>
                             <Field>
                                 <FieldLabel htmlFor="password">Подтверждение пароля</FieldLabel>
                                 <Input
-                                    className={errors.confirmPassword ? "border-red-500" : ""}
+                                    className={errors.confirmPassword ? 'border-red-500' : ''}
                                     name="password"
                                     type="password"
                                     onChange={(e) =>
@@ -63,7 +63,7 @@ const ChangePasswordDialog = ({
                                             })
                                         )
                                     }
-                                    required />
+                                    required/>
                             </Field>
                             <Field>
                                 <Button type="submit">Изменить пароль</Button>
@@ -79,6 +79,8 @@ const ChangePasswordDialog = ({
                 onOpenChange={setOpenConfirmationDialog}
 
                 handlePasswordChange={handlePasswordChange}
+
+                password={password}
             />
         </section>
     )

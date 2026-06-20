@@ -7,7 +7,7 @@ export interface AppealsTableProps {
     onRowClick?: (appeal: Appeal) => void
 }
 
-const columns: ColumnDef<Appeal> = [
+const columns: ColumnDef<Appeal>[] = [
     {
         accessorKey: 'title',
         header: 'Заголовок'

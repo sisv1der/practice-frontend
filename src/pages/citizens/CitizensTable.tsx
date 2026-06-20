@@ -7,7 +7,7 @@ export interface CitizensTableProps {
     citizens: Citizen[]
 }
 
-const columns: ColumnDef<Citizen> = [
+const columns: ColumnDef<Citizen>[] = [
     {
         accessorKey: 'fullName',
         header: 'Имя'

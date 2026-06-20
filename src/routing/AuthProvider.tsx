@@ -3,9 +3,9 @@ import type { ReactNode } from 'react'
 import type { User } from '@/types/User'
 import { AuthContext } from './auth-context'
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = useState<User | null>(null)
-    const [loading, setLoading] = useState(true)
+export const AuthProvider = ({children}: { children: ReactNode }) => {
+    const [ user, setUser ] = useState<User | null>(null)
+    const [ loading, setLoading ] = useState(true)
 
     useEffect(() => {
         const raw = localStorage.getItem('user')
@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, [])
 
     const login = (user: User) => {
-        if (loading) return null
+        if (loading) return
 
         localStorage.setItem('user', JSON.stringify(user))
         setUser(user)
