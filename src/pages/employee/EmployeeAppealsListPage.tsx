@@ -1,15 +1,16 @@
-import { exportAppeals } from '@/api/appeal'
+import { claimAppeal } from '@/api/appeal'
 import PaginationCustom from '@/components/PaginationCustom'
 import { Button } from '@/components/ui/Button'
 import { Field, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/Field'
 import { Input } from '@/components/ui/Input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
-import AppealsTable from '@/pages/appeals/AppealsTable'
 import { useAppeals } from '@/pages/appeals/hooks/useAppeals'
+import EmployeeAppealsTable from '@/pages/employee/EmployeeAppealsTable'
+import type { Appeal } from '@/types/Appeal'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
-const AppealsListPage = () => {
+const EmployeeAppealsListPage = () => {
     const navigate = useNavigate()
 
     const [ filters, setFilters ] = useState({
@@ -20,7 +21,7 @@ const AppealsListPage = () => {
 
     const [ page, setPage ] = useState<number>(0)
 
-    const {appeals, totalPages} = useAppeals(
+    const {appeals, totalPages, refetch} = useAppeals(
         filters.search,
         filters.status,
         filters.category,
@@ -28,18 +29,17 @@ const AppealsListPage = () => {
         10
     )
 
+    const handleClaim = async (appeal: Appeal) => {
+        await claimAppeal(appeal.id)
+        await refetch()
+    }
+
     return (
         <div className="flex flex-col min-h-full gap-6">
             <section className="flex flex-row justify-between items-center">
                 <h2 className="text-xl font-semibold">
                     Обращения
                 </h2>
-
-                <Button
-                    onClick={() => void navigate(`new`)}
-                >
-                    Создать
-                </Button>
             </section>
 
             <section>
@@ -138,25 +138,17 @@ const AppealsListPage = () => {
                                 </SelectContent>
                             </Select>
                         </Field>
-
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() =>
-                                void exportAppeals({
-                                    search: filters.search,
-                                    status: filters.status,
-                                    category: filters.category
-                                })
-                            }
-                        >
-                            Экспорт в Excel
-                        </Button>
                     </div>
                 </FieldSet>
             </section>
 
-            <AppealsTable appeals={appeals} onRowClick={(appeal) => void navigate(`${appeal.id}`)}/>
+            <EmployeeAppealsTable
+                appeals={appeals}
+
+                onRowClick={(appeal: Appeal) => void navigate(`${appeal.id}`)}
+
+                onClaimClick={(appeal: Appeal) => void handleClaim(appeal)}
+            />
 
             <section className="mt-auto">
                 <PaginationCustom
@@ -175,4 +167,4 @@ const AppealsListPage = () => {
     )
 }
 
-export default AppealsListPage
+export default EmployeeAppealsListPage

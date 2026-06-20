@@ -16,5 +16,8 @@ export const useAppealComments = (appealId: string) => {
         loadComments().catch(r => console.log(r))
     }, [ loadComments, appealId ])
 
-    return appealComments
+    return {
+        appealComments,
+        refetch: loadComments
+    }
 }

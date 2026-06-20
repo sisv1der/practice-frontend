@@ -21,6 +21,12 @@ export interface GetAppealsRequest extends PageableRequest {
     category?: AppealCategory
 }
 
+export interface ExportAppealsRequest {
+    search?: string
+    status?: AppealStatus
+    category?: AppealCategory
+}
+
 export interface CreateAppealRequest {
     title: string
     description?: string
@@ -47,32 +53,42 @@ export const getAppeal = async (id: string): Promise<AppealInfoResponse> => {
 }
 
 export const createAppeal = async (request: CreateAppealRequest) => {
-    const res = await api.post<AppealInfoResponse>(
-        `/appeals`,
-        {
-            params: {
-                title: request.title,
-                description: request.description,
-                category: request.category,
-                citizenId: request.citizenId
-            }
-        }
-    )
+    const res = await api.post<AppealInfoResponse>(`/appeals`, request)
     return res.data
 }
 
 export const updateAppeal = async (id: string, request: UpdateAppealRequest) => {
-    const res = await api.put<AppealInfoResponse>(
-        `/appeals/${id}`,
-        {
-            params: {
-                title: request.title,
-                description: request.description,
-                status: request.status,
-                category: request.category,
-                citizenId: request.citizenId
-            }
-        }
-    )
+    const res = await api.put<AppealInfoResponse>(`/appeals/${id}`, request)
     return res.data
+}
+
+export const claimAppeal = async (id: string) => {
+    const res = await api.patch<AppealInfoResponse>(`/appeals/${id}/status`)
+    return res.data
+}
+
+export const exportAppeals = async (request: ExportAppealsRequest) => {
+    const res = await api.get<Blob>('/appeals/export', {
+        responseType: 'blob',
+        params: request
+    })
+
+    const url = window.URL.createObjectURL(res.data)
+
+    const link = document.createElement('a')
+
+    link.href = url
+    link.download = 'report.xlsx'
+
+    document.body.appendChild(link)
+
+    link.click()
+
+    link.remove()
+
+    setTimeout(() => {
+        window.URL.revokeObjectURL(url)
+    }, 1000)
+
+    link.remove()
 }

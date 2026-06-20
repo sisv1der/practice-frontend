@@ -1,14 +1,16 @@
 import { createAppeal, updateAppeal } from '@/api/appeal'
+import { createAppealComment } from '@/api/appeal-comment'
 import { Button } from '@/components/ui/Button'
-import { DialogHeader, DialogTitle } from '@/components/ui/Dialog'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/Field'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
 import CommentCard from '@/pages/appeals/CommentCard'
 import CitizenSelectDialog from '@/pages/appeals/dialogs/CitizenSelectDialog'
+import CreateCommentDialog from '@/pages/appeals/dialogs/CreateCommentDialog'
 import { useAppealComments } from '@/pages/appeals/hooks/useAppealComments'
 import { useCitizen } from '@/pages/citizens/hooks/useCitizen'
+import { useAuth } from '@/routing/auth-context'
 import type { AppealCategory, AppealStatus } from '@/types/Appeal'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -60,14 +62,24 @@ const AppealForm = ({mode, context}: AppealFormProps) => {
     }, [ context ])
 
     const [ openCitizenSelectDialog, setOpenCitizenSelectDialog ] = useState<boolean>(false)
+    const [ openCreateCommentDialog, setOpenCreateCommentDialog ] = useState<boolean>(false)
+
+    const {user} = useAuth()
+
+    const isEmployee = user?.role === 'EMPLOYEE'
 
     const config = MODE_CONFIG[mode]
 
     const citizen = useCitizen(formState.citizenId)
-    const comments = useAppealComments(context.id)
+    const {appealComments: comments, refetch: refetchComments} = useAppealComments(context.id)
 
     const goBack = () => {
         void navigate(-1)
+    }
+
+    const handleSaveComment = async (text: string) => {
+        await createAppealComment(context.id, text)
+        await refetchComments()
     }
 
     const handleSaveAppeal = async () => {
@@ -249,24 +261,25 @@ const AppealForm = ({mode, context}: AppealFormProps) => {
                     </Field>
                 </FieldGroup>
                 <div className="flex gap-3 justify-center mt-6">
-                    <div>
-                        {config.readOnly ? (
-                            <Button
-                                type="button"
-                                onClick={() => void navigate('edit')}
-                                className="w-fit min-w-28"
-                            >
-                                Изменить
-                            </Button>
-                        ) : (
-                            <Button
-                                type="submit"
-                                className="w-fit min-w-28"
-                            >
-                                Сохранить
-                            </Button>
-                        )}
-                    </div>
+                    {!isEmployee &&
+                        <div>
+                            {config.readOnly ? (
+                                <Button
+                                    type="button"
+                                    onClick={() => void navigate('edit')}
+                                    className="w-fit min-w-28"
+                                >
+                                    Изменить
+                                </Button>
+                            ) : (
+                                <Button
+                                    type="submit"
+                                    className="w-fit min-w-28"
+                                >
+                                    Сохранить
+                                </Button>
+                            )}
+                        </div>}
                     <Button
                         type="button"
                         onClick={() => goBack()}
@@ -278,9 +291,22 @@ const AppealForm = ({mode, context}: AppealFormProps) => {
             </form>
 
             <section className="mt-8">
-                <h3 className="text-lg font-semibold mb-4">
-                    Комментарии
-                </h3>
+                <
+                    div className="mb-4 flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">
+                        Комментарии
+                    </h3>
+
+                    {isEmployee && (
+                        <Button
+                            type="button"
+                            onClick={() => setOpenCreateCommentDialog(true)}
+                            className="w-fit"
+                        >
+                            Добавить комментарий
+                        </Button>
+                    )}
+                </div>
 
                 <div className="flex flex-col gap-3">
                     {comments.map(comment => (
@@ -303,6 +329,14 @@ const AppealForm = ({mode, context}: AppealFormProps) => {
                         citizenId: citizen.id
                     }))
                 }
+            />
+
+            <CreateCommentDialog
+                open={openCreateCommentDialog}
+
+                onOpenChange={setOpenCreateCommentDialog}
+
+                onCreate={handleSaveComment}
             />
         </div>
     )

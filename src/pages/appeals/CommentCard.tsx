@@ -1,4 +1,4 @@
-import { CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { CardContent, CardHeader, CardTitle, Card } from '@/components/ui/Card'
 import type { AppealComment } from '@/types/AppealComment'
 
 export interface CommentCardProps {
@@ -10,7 +10,7 @@ const CommentCard = ({comment}: CommentCardProps) => {
         <Card>
             <CardHeader>
                 <CardTitle>
-                    {comment.createdAt}
+                    {new Date(comment.createdAt).toLocaleString()}
                 </CardTitle>
             </CardHeader>
             <CardContent>

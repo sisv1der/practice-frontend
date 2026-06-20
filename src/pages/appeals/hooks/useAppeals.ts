@@ -16,22 +16,24 @@ export const useAppeals = (
 
     const loadAppeals = useCallback(async () => {
         const res: PageResponse<AppealInfoResponse> = await getAppeals({
-            search: search,
-            status: status,
-            category: category,
-            page: page,
-            size: size
+            search,
+            status,
+            category,
+            page,
+            size
         })
+
         setAppeals(res.content.map(fromAppealInfo))
         setTotalPages(res.totalPages)
-    }, [ category, page, search, size, status ])
+    }, [ search, status, category, page, size ])
 
     useEffect(() => {
-        loadAppeals().catch(r => console.log(r))
+        loadAppeals().catch(console.error)
     }, [ loadAppeals ])
 
     return {
         appeals,
-        totalPages
+        totalPages,
+        refetch: loadAppeals
     }
 }

@@ -1,8 +1,7 @@
 import Sidebar from '@/components/Sidebar'
 import { Button } from '@/components/ui/Button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs'
-import type { User } from '@/types/User'
-import { useEffect } from 'react'
+import { useAuth } from '@/routing/auth-context'
 import { useLocation, useNavigate } from 'react-router'
 
 const OperatorSidebar = () => {
@@ -12,19 +11,14 @@ const OperatorSidebar = () => {
         ? 'CITIZENS'
         : 'APPEALS'
 
-    const raw = localStorage.getItem('user')
-    const user: User | null = raw ? (JSON.parse(raw) as User) : null
-    useEffect(() => {
-        if (!user) void navigate('/')
-    }, [navigate, user])
-    if (!user) return null
+    const {user, logout} = useAuth()
 
     return (
         <aside className="flex-none">
             <Sidebar
                 pageTitle="Рабочее место оператора"
                 footer={
-                    <Button variant="destructive">
+                    <Button variant="destructive" onClick={logout}>
                         Выйти
                     </Button>
                 }

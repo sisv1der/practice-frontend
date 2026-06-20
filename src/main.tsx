@@ -5,12 +5,14 @@ import AppealFormView from '@/pages/appeals/form/AppealFormView'
 import CitizensListPage from '@/pages/citizens/CitizensListPage'
 import CitizenForm from '@/pages/citizens/CitizenForm'
 import CitizenAppeals from '@/pages/citizens/CitizenAppeals'
+import EmployeeAppealsListPage from '@/pages/employee/EmployeeAppealsListPage'
+import EmployeeLayout from '@/pages/employee/EmployeeLayout'
 import OperatorHome from '@/pages/operator/OperatorHome'
 import OperatorLayout from '@/pages/operator/OperatorLayout'
 import { AuthProvider } from '@/routing/AuthProvider'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router'
 
 import '@/styles/globals.css'
 import LoginPage from '@/pages/login/LoginPage'
@@ -67,6 +69,18 @@ createRoot(document.getElementById('root')!).render(
                             <Route path="citizens/:citizenId/appeals/new" element={<AppealFormCreate/>}/>
                             <Route path="citizens/:citizenId/appeals/:id" element={<AppealFormView/>}/>
                             <Route path="citizens/:id/edit" element={<CitizenForm readonly={false}/>}/>
+                        </Route>
+
+                        <Route
+                            path="/employee"
+                            element={
+                                <EmployeeLayout/>
+                            }
+                        >
+                            <Route index element={<Navigate to="appeals" replace/>}/>
+
+                            <Route path="appeals" element={<EmployeeAppealsListPage/>}/>
+                            <Route path="appeals/:id" element={<AppealFormView/>}/>
                         </Route>
                     </Route>
                 </Routes>
